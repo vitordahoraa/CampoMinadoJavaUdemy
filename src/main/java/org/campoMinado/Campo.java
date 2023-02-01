@@ -87,16 +87,20 @@ public class Campo {
         return "?";
     }
 
-    public boolean isOver(){
+    boolean isOver(){
         if(minado && marcado) return true;
         if(!minado && aberto) return true;
         return false;
     }
 
-    public void reiniciar(){
+    void reiniciar(){
         this.aberto = false;
         this.minado = false;
 
+    }
+
+    boolean ObjetivoAlcancado(){
+        return (this.minado && this.marcado) || this.aberto;
     }
 
 }

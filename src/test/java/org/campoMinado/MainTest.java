@@ -9,10 +9,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class MainTest {
     private Campo campo1;
     private Tabuleiro tabuleiro1;
+    private Menu menu;
     @BeforeEach
     void iniciarCampo() {
         campo1 = new Campo(1, 1, false);
         tabuleiro1 =  new Tabuleiro(6,6,6);
+        menu = new Menu(tabuleiro1);
     }
     @Test
     void testVizinho1(){
@@ -166,6 +168,11 @@ class MainTest {
         tabuleiro1.marcar(1,1);
         System.out.println(tabuleiro1);
         assertTrue(tabuleiro1.getCampo(1,1).getMarcado());
+    }
+    @Test
+    void MenuSair(){
+        menu.executar();
+        assertTrue(true);
     }
 
 }

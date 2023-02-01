@@ -73,16 +73,33 @@ public class Tabuleiro {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("  ");
+        for(int i = 0; i < colunas;i++){
+            sb.append(i+1).append(" ");
+        }
+
+        sb.append("\n");
 
         for(int i = 0; i < linhas;i++){
+            sb.append(i+1).append(" ");
             for(int j = 0; j < colunas; j++){
-                sb.append(campos.get((i*linhas) + j).toString());
-                sb.append(" ");
+                sb.append(campos.get((i*linhas) + j).toString()).append(" ");
             }
             sb.append("\n");
 
         }
 
         return sb.toString();
+    }
+
+    void reiniciar(){
+        campos=new ArrayList<Campo>();
+        this.criar();
+        this.vizinhar();
+        this.minar();
+    }
+
+    boolean ObjetivoAlcancado(){
+        return campos.stream().allMatch(c-> c.ObjetivoAlcancado());
     }
 }

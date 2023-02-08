@@ -64,6 +64,7 @@ public class ButtonCampo extends JButton implements CampoObservador, MouseListen
 
             setBackground(BG_MARCADO);
             setText("M");
+            setForeground(Color.BLACK);
     }
 
     private void aplicarEstiloAbrir() {

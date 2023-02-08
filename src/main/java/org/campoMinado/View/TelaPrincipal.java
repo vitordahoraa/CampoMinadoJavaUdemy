@@ -7,7 +7,7 @@ import javax.swing.*;
 public class TelaPrincipal extends JFrame {
     public TelaPrincipal(){
 
-        Tabuleiro tab1 = new Tabuleiro(15,10,2);
+        Tabuleiro tab1 = new Tabuleiro(15,10,10);
         add(new PainelTabuleiro(tab1));
         setTitle("Campo Minado");
         setSize(690,438);

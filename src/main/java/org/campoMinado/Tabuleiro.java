@@ -1,16 +1,41 @@
 package org.campoMinado;
 
+import org.campoMinado.Enum.CampoEvento;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
 
-public class Tabuleiro {
+public class Tabuleiro implements CampoObservador{
 
-    private int linhas;
-    private int colunas;
+    private final int linhas;
+    private final int colunas;
 
     private int minas;
 
+    public int getLinhas() {
+        return linhas;
+    }
+
+
+    public int getColunas() {
+        return colunas;
+    }
+
+
     private List<Campo> campos = new ArrayList<Campo>();
+
+    private Set<Consumer<Boolean>> observers = new HashSet<>();
+
+    public void RegistrarObservador(Consumer<Boolean> c){
+        observers.add(c);
+    }
+    private void ExecutarEvento(Boolean b){
+        observers.stream().forEach(c-> c.accept(b));
+    }
+
 
     public Tabuleiro(int linhas, int colunas, int minas){
         this.linhas=linhas;
@@ -21,14 +46,17 @@ public class Tabuleiro {
         minar();
     }
 
-    Campo getCampo(int linha, int coluna){
+    public Campo getCampo(int linha, int coluna){
         return campos.stream().filter(c-> c.getLinha()==linha && c.getColuna()==coluna).findFirst().get();
     }
 
     private void criar(){
         for(int i = 0; i < linhas; i++)
-            for(int j = 0;j<colunas;j++)
-                campos.add(new Campo(i,j));
+            for(int j = 0;j<colunas;j++) {
+                Campo campo1 = new Campo(i, j);
+                campo1.RegistrarObservador(this);
+                campos.add(campo1);
+            }
     }
 
     private void vizinhar(){
@@ -92,14 +120,30 @@ public class Tabuleiro {
         return sb.toString();
     }
 
-    void reiniciar(){
-        campos=new ArrayList<Campo>();
-        this.criar();
-        this.vizinhar();
-        this.minar();
+    public void reiniciar(){
+        campos.stream().forEach(c-> c.reiniciar());
+        minar();
     }
 
-    boolean ObjetivoAlcancado(){
+    public boolean ObjetivoAlcancado(){
         return campos.stream().allMatch(c-> c.ObjetivoAlcancado());
+    }
+
+    @Override
+    public void EventoOcorreu(Campo campo, CampoEvento CampoEvento) {
+        if(CampoEvento == CampoEvento.EXPLODIR){
+            mostrarMinas();
+            ExecutarEvento(Boolean.FALSE);
+        }else if(ObjetivoAlcancado()){
+            ExecutarEvento(Boolean.TRUE);
+        }
+    }
+
+    private void mostrarMinas() {
+        campos.stream().filter(c -> c.getMinado()).filter(c-> !c.getMarcado()).forEach(c -> c.setAberto(true));
+    }
+
+    public void ForEachCampo(Consumer<Campo> c){
+        campos.forEach(c);
     }
 }

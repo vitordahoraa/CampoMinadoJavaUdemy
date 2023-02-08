@@ -1,4 +1,9 @@
-package org.campoMinado;
+package org.campoMinado.View;
+
+import org.campoMinado.Campo;
+import org.campoMinado.ExplosionException;
+import org.campoMinado.SairException;
+import org.campoMinado.Tabuleiro;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -7,11 +12,11 @@ public class Menu {
     private Tabuleiro tabuleiro;
 
     Scanner scan = new Scanner(System.in);
-    Menu(Tabuleiro tabuleiro){
+    public Menu(Tabuleiro tabuleiro){
         this.tabuleiro = tabuleiro;
     }
 
-    void executar(){
+    public void executar(){
         try{
             boolean jogoAberto = true;
             while(jogoAberto){

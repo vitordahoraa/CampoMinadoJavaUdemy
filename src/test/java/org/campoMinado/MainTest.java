@@ -1,6 +1,6 @@
 package org.campoMinado;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.campoMinado.View.Menu;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

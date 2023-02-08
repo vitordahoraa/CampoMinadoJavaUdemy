@@ -1,7 +1,12 @@
 package org.campoMinado;
 
+import org.campoMinado.Enum.CampoEvento;
+
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Campo {
 
@@ -13,12 +18,26 @@ public class Campo {
     private boolean marcado = false; //Todos os campos começam não marcados
     private List<Campo> camposVizinho = new ArrayList<Campo>(); //Lista que armazena uma lista de campos com minas nas
                                                                 // proximidades
+    private Set<CampoObservador> observers = new LinkedHashSet<>();
 
     public boolean getMarcado(){return this.marcado;}
     public boolean getAberto(){return this.aberto;}
     public boolean getMinado(){return this.minado;}
     public int getLinha(){return this.linha;}
     public int getColuna(){return this.coluna;}
+
+    public void setAberto(boolean abrir){
+        this.aberto=abrir;
+        if(aberto)
+            ExecutarEvento(CampoEvento.ABRIR);
+    }
+    public void RegistrarObservador(CampoObservador Obs){
+        observers.add(Obs);
+    }
+
+    public void ExecutarEvento(CampoEvento evento){
+        observers.stream().forEach(o->o.EventoOcorreu(this,evento));
+    }
 
     Campo(int linha, int coluna, boolean minado){
         this.coluna = coluna;
@@ -41,17 +60,25 @@ public class Campo {
         return false;
     }
 
-    void alternarMarcado(){//Marca ou desmarca o campo, apenas se ele estiver fechado
-        if(!aberto)
+    public void alternarMarcado() {//Marca ou desmarca o campo, apenas se ele estiver fechado
+        if (!aberto) {
             this.marcado = !this.marcado;
+            if(marcado)
+                ExecutarEvento(CampoEvento.MARCAR);
+            else
+                ExecutarEvento(CampoEvento.DESMARCAR);
+        }
     }
-
-    boolean abrir() { // Abre o campo, se ele não estiver aberto e nem marcado. Se possuir uma bomba, perde o jogo
+    public boolean abrir() { // Abre o campo, se ele não estiver aberto e nem marcado. Se possuir uma bomba, perde o jogo
         if (!aberto && !marcado) {
             this.aberto = true;
             if(minado){
-                throw new ExplosionException();
+                ExecutarEvento(CampoEvento.EXPLODIR);
+                return true;
             }
+
+            ExecutarEvento(CampoEvento.ABRIR);
+
             //Se nenhum vizinho tem bomba, abre eles também, inicando o processo recursivo
             if(proximidadeSegura()){
                 camposVizinho.forEach(v-> v.abrir());
@@ -62,7 +89,7 @@ public class Campo {
         return false;
     }
 
-    boolean proximidadeSegura(){//Caso nenhum vizinho tenha mina, retorna True
+    public boolean proximidadeSegura(){//Caso nenhum vizinho tenha mina, retorna True
         return camposVizinho.stream().noneMatch(v -> v.minado);
     }
 
@@ -70,7 +97,7 @@ public class Campo {
         this.minado = true;
     }
 
-    long minasVizinhanca(){ // retorna o número de minas na vizinhança
+    public long minasVizinhanca(){ // retorna o número de minas na vizinhança
         return this.camposVizinho.stream().filter(v -> v.minado).count();
     }
 
@@ -96,11 +123,13 @@ public class Campo {
     void reiniciar(){
         this.aberto = false;
         this.minado = false;
+        this.marcado= false;
+        ExecutarEvento(CampoEvento.REINICIAR);
 
     }
 
     boolean ObjetivoAlcancado(){
-        return (this.minado && this.marcado) || this.aberto;
+        return (this.minado && this.marcado) || (this.aberto && !this.minado);
     }
 
 }
